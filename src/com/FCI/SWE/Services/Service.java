@@ -120,6 +120,29 @@ public class Service {
 		return object.toString();
 
 	}
+	
+	@POST
+	@Path("/ConfirmService")
+	public void AcceptService(int uid1, int uid2) {
+		boolean accept = false;
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Query q = new Query("friends");
+		PreparedQuery pq = ds.prepare(q);
+		List<Entity> friends = pq.asList(FetchOptions.Builder.withDefaults());
+		
+		for (Entity entity : pq.asIterable()) {
+			if (Boolean.parseBoolean(entity.getProperty("accept").toString()) == true) {
+				return;
+			}
+		}
+		accept = true;
+		Entity friend = new Entity("friends", friends.size() + 1);
+		friend.setProperty("uid1", uid1);
+		friend.setProperty("uid2", uid2);
+		friend.setProperty("accept", accept);
+		ds.put(friend);
+		
+	}
 
 
 }
